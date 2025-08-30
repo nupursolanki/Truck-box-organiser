@@ -334,8 +334,6 @@ const TruckLoadingApp = () => {
                   </CardContent>
                 </Card>
               </TabsContent>
-                </Card>
-              </TabsContent>
             </Tabs>
 
             {/* Loading Controls */}
