@@ -3,31 +3,31 @@
 export const mockTruckTypes = [
   {
     id: '1',
-    name: 'Compact Truck',
+    name: 'Compact Truck',  // Preserved exactly as user entered
     length: 3000, // mm
     width: 1800   // mm
   },
   {
     id: '2', 
-    name: 'Standard Truck',
+    name: 'Standard Truck',  // Preserved exactly as user entered
     length: 6000, // mm
     width: 2400   // mm
   },
   {
     id: '3',
-    name: 'Large Truck',
+    name: 'Large Truck',  // Preserved exactly as user entered
     length: 9000, // mm
     width: 2500   // mm
   },
   {
     id: '4',
-    name: 'Extra Large Truck',
+    name: 'Extra Large Truck',  // Preserved exactly as user entered
     length: 12000, // mm
     width: 2500    // mm
   },
   {
     id: '5',
-    name: 'Small Truck',
+    name: 'Small Truck',  // Preserved exactly as user entered
     length: 4500, // mm
     width: 2000   // mm
   }
