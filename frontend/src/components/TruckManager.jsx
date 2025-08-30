@@ -56,6 +56,8 @@ const TruckManager = ({ onTruckSelect, selectedTruckId, onTrucksUpdate }) => {
     setTrucks(updatedTrucks);
     // Save to localStorage to persist user changes
     localStorage.setItem('userTrucks', JSON.stringify(updatedTrucks));
+    // Notify parent component of truck updates
+    if (onTrucksUpdate) onTrucksUpdate();
     resetForm();
   };
 
