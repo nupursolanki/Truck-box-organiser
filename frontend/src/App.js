@@ -180,7 +180,7 @@ const TruckLoadingApp = () => {
               </p>
             </div>
             
-            {arrangement.length > 0 && (
+            {(arrangement.length > 0 || selectedSolution) && (
               <Button onClick={handleExportArrangement} variant="outline">
                 <Download className="h-4 w-4 mr-2" />
                 Export Layout
