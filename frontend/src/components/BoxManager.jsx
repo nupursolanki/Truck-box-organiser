@@ -289,7 +289,7 @@ const BoxManager = ({ onBoxesChange, selectedTruckId, optimizationMode = 'single
         </div>
       )}
       
-      {boxes.length === 0 && selectedTruckId && (
+      {boxes.length === 0 && (selectedTruckId || optimizationMode === 'multi') && (
         <Card className="border-gray-200">
           <CardContent className="pt-6 pb-6 text-center">
             <Package className="h-12 w-12 text-gray-400 mx-auto mb-3" />
