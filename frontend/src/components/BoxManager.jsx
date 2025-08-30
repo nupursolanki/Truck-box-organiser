@@ -203,7 +203,7 @@ const BoxManager = ({ onBoxesChange, selectedTruckId, optimizationMode = 'single
         </Dialog>
       </div>
 
-      {!selectedTruckId && (
+      {(!selectedTruckId && optimizationMode === 'single') && (
         <Card className="border-yellow-200 bg-yellow-50">
           <CardContent className="pt-4">
             <p className="text-sm text-yellow-800">
