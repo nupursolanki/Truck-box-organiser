@@ -332,6 +332,7 @@ const TruckLoadingApp = () => {
                     <TruckManager 
                       onTruckSelect={setSelectedTruckId}
                       selectedTruckId={selectedTruckId}
+                      onTrucksUpdate={handleTrucksUpdate}
                     />
                   </CardContent>
                 </Card>
