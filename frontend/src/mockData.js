@@ -3,31 +3,33 @@
 export const mockTruckTypes = [
   {
     id: '1',
-    name: 'Small Delivery Van',
+    name: 'Compact Truck',
     length: 3000, // mm
-    width: 1800,  // mm
-    type: 'van'
+    width: 1800   // mm
   },
   {
     id: '2', 
-    name: 'Medium Box Truck',
+    name: 'Standard Truck',
     length: 6000, // mm
-    width: 2400,  // mm
-    type: 'box_truck'
+    width: 2400   // mm
   },
   {
     id: '3',
-    name: 'Large Semi Trailer',
-    length: 12000, // mm
-    width: 2500,   // mm
-    type: 'semi_trailer'
+    name: 'Large Truck',
+    length: 9000, // mm
+    width: 2500   // mm
   },
   {
     id: '4',
-    name: 'Standard Container',
-    length: 12190, // mm (40ft container)
-    width: 2438,   // mm
-    type: 'container'
+    name: 'Extra Large Truck',
+    length: 12000, // mm
+    width: 2500    // mm
+  },
+  {
+    id: '5',
+    name: 'Small Truck',
+    length: 4500, // mm
+    width: 2000   // mm
   }
 ];
 
