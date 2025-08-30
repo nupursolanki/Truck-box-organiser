@@ -66,8 +66,7 @@ const TruckManager = ({ onTruckSelect, selectedTruckId }) => {
     setFormData({
       name: truck.name,
       length: truck.length.toString(),
-      width: truck.width.toString(),
-      type: truck.type
+      width: truck.width.toString()
     });
     setIsDialogOpen(true);
   };
