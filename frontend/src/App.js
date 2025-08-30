@@ -329,8 +329,11 @@ const TruckLoadingApp = () => {
                     <BoxManager 
                       onBoxesChange={setBoxes}
                       selectedTruckId={selectedTruckId}
+                      optimizationMode={optimizationMode}
                     />
                   </CardContent>
+                </Card>
+              </TabsContent>
                 </Card>
               </TabsContent>
             </Tabs>
