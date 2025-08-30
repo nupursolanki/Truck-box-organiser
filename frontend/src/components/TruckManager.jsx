@@ -162,57 +162,60 @@ const TruckManager = ({ onTruckSelect, selectedTruckId }) => {
       <div>
         <Label className="text-sm font-medium">Select Truck for Loading</Label>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-2">
-          {trucks.map(truck => (
-            <Card 
-              key={truck.id}
-              className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
-                selectedTruckId === truck.id 
-                  ? 'ring-2 ring-blue-500 bg-blue-50' 
-                  : 'hover:shadow-sm'
-              }`}
-              onClick={() => onTruckSelect(truck.id)}
-            >
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm flex items-center justify-between">
-                  <span className="truncate">{truck.name}</span>
-                  <div className="flex gap-1 ml-2">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="h-6 w-6 p-0"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEdit(truck);
-                      }}
-                    >
-                      <Edit className="h-3 w-3" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDelete(truck.id);
-                      }}
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
+          {trucks.map(truck => {
+            const category = getTruckCategory(truck.length);
+            return (
+              <Card 
+                key={truck.id}
+                className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
+                  selectedTruckId === truck.id 
+                    ? 'ring-2 ring-blue-500 bg-blue-50' 
+                    : 'hover:shadow-sm'
+                }`}
+                onClick={() => onTruckSelect(truck.id)}
+              >
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm flex items-center justify-between">
+                    <span className="truncate">{truck.name}</span>
+                    <div className="flex gap-1 ml-2">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-6 w-6 p-0"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEdit(truck);
+                        }}
+                      >
+                        <Edit className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(truck.id);
+                        }}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="text-xs text-gray-600 space-y-1">
+                    <div>Length: <span className="font-medium">{truck.length.toLocaleString()}mm</span></div>
+                    <div>Width: <span className="font-medium">{truck.width.toLocaleString()}mm</span></div>
+                    <div>Category: <span className={`font-medium ${category.color}`}>{category.label}</span></div>
+                    <div className="text-xs text-gray-500 mt-2">
+                      Area: {((truck.length * truck.width) / 1000000).toFixed(1)}m²
+                    </div>
                   </div>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="text-xs text-gray-600 space-y-1">
-                  <div>Length: <span className="font-medium">{truck.length.toLocaleString()}mm</span></div>
-                  <div>Width: <span className="font-medium">{truck.width.toLocaleString()}mm</span></div>
-                  <div>Type: <span className="font-medium capitalize">{truck.type.replace('_', ' ')}</span></div>
-                  <div className="text-xs text-gray-500 mt-2">
-                    Area: {((truck.length * truck.width) / 1000000).toFixed(1)}m²
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </div>
 
