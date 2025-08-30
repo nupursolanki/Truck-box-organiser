@@ -160,7 +160,7 @@ const TruckManager = ({ onTruckSelect, selectedTruckId }) => {
 
       {/* Truck Selection */}
       <div>
-        <Label className="text-sm font-medium">Select Truck for Loading</Label>
+        <Label className="text-sm font-medium">Market Available Truck Sizes</Label>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-2">
           {trucks.map(truck => {
             const category = getTruckCategory(truck.length);
