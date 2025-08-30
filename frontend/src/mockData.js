@@ -334,7 +334,7 @@ export const packingAlgorithm = {
         truck, 
         box, 
         arrangements, 
-        box.instanceName || `${box.name}-${i + 1}`
+        box.instanceName || box.name  // Use exact user-entered name
       );
       
       if (placement) {
