@@ -149,7 +149,7 @@ export const packingAlgorithm = {
     return solutions.sort((a, b) => b.overallScore - a.overallScore);
   },
   
-  // Multi-truck optimization algorithm
+  // Multi-truck optimization algorithm with focus on minimizing trucks and avoiding space waste
   optimizeMultiTruck: (availableTrucks, boxes, strategy) => {
     const solution = {
       trucks: [],
@@ -160,7 +160,8 @@ export const packingAlgorithm = {
       overallUtilization: 0,
       overallScore: 0,
       unplacedBoxes: [],
-      totalCost: 0
+      totalCost: 0,
+      spaceWastage: 0
     };
     
     // Create expanded box list with individual instances
@@ -176,14 +177,19 @@ export const packingAlgorithm = {
       }
     });
     
-    // Sort boxes by size (largest first for better packing)
+    // Sort boxes by area (largest first for better packing)
     remainingBoxes.sort((a, b) => (b.length * b.width) - (a.length * a.width));
+    
+    // Sort trucks by area (smallest to largest for minimal waste)
+    const sortedTrucks = [...availableTrucks].sort((a, b) => 
+      (a.length * a.width) - (b.length * b.width)
+    );
     
     let truckCounter = 1;
     
     while (remainingBoxes.length > 0) {
-      const bestTruckChoice = packingAlgorithm.selectBestTruck(
-        availableTrucks, 
+      const bestTruckChoice = packingAlgorithm.selectOptimalTruck(
+        sortedTrucks, 
         remainingBoxes, 
         strategy
       );
@@ -197,6 +203,12 @@ export const packingAlgorithm = {
       
       if (truckArrangement.arrangements.length === 0) break;
       
+      // Calculate space wastage for this truck
+      const truckArea = bestTruckChoice.truck.length * bestTruckChoice.truck.width;
+      const usedArea = truckArrangement.arrangements.reduce((sum, arr) => 
+        sum + (arr.width * arr.height), 0);
+      const wastage = truckArea - usedArea;
+      
       // Add truck to solution
       solution.trucks.push({
         truckId: `${bestTruckChoice.truck.id}-${truckCounter}`,
@@ -205,7 +217,8 @@ export const packingAlgorithm = {
         arrangements: truckArrangement.arrangements,
         utilization: truckArrangement.utilization,
         boxCount: truckArrangement.arrangements.length,
-        efficiency: truckArrangement.efficiency
+        efficiency: truckArrangement.efficiency,
+        wastedSpace: wastage / 1000000 // Convert to m²
       });
       
       // Remove placed boxes from remaining boxes
@@ -213,10 +226,11 @@ export const packingAlgorithm = {
       remainingBoxes = remainingBoxes.filter(box => !placedInstanceIds.includes(box.instanceId));
       
       solution.totalBoxesPlaced += truckArrangement.arrangements.length;
+      solution.spaceWastage += wastage;
       truckCounter++;
       
       // Prevent infinite loops
-      if (truckCounter > 20) break;
+      if (truckCounter > 15) break;
     }
     
     solution.totalTrucks = solution.trucks.length;
@@ -232,18 +246,23 @@ export const packingAlgorithm = {
       
       solution.overallUtilization = (totalUsedArea / totalTruckArea) * 100;
       solution.totalCost = solution.trucks.length * 1000; // Base cost per truck
+      solution.spaceWastage = solution.spaceWastage / 1000000; // Convert to m²
       
-      // Calculate strategy-based score
+      // Calculate strategy-based score with heavy penalty for multiple trucks
+      const truckPenalty = (solution.totalTrucks - 1) * 20; // Heavy penalty for additional trucks
+      const wastePenalty = solution.spaceWastage * 5; // Penalty for wasted space
+      
       switch (strategy.priority) {
         case 'truck_count':
-          solution.overallScore = (solution.totalBoxesPlaced / solution.totalBoxes) * 100 - (solution.totalTrucks * 5);
+          solution.overallScore = (solution.totalBoxesPlaced / solution.totalBoxes) * 100 - truckPenalty - wastePenalty;
           break;
         case 'space_utilization':
-          solution.overallScore = solution.overallUtilization;
+          solution.overallScore = solution.overallUtilization - (truckPenalty * 0.5);
           break;
         case 'balanced':
-          solution.overallScore = (solution.overallUtilization * 0.7) + 
-                                 ((solution.totalBoxesPlaced / solution.totalBoxes) * 0.3 * 100);
+          solution.overallScore = (solution.overallUtilization * 0.6) + 
+                                 ((solution.totalBoxesPlaced / solution.totalBoxes) * 0.4 * 100) - 
+                                 (truckPenalty * 0.3);
           break;
       }
     }
@@ -251,28 +270,39 @@ export const packingAlgorithm = {
     return solution;
   },
   
-  // Select best truck type for remaining boxes
-  selectBestTruck: (availableTrucks, remainingBoxes, strategy) => {
+  // Select optimal truck that minimizes count and waste
+  selectOptimalTruck: (availableTrucks, remainingBoxes, strategy) => {
     const truckScores = [];
     
     for (const truck of availableTrucks) {
       const testArrangement = packingAlgorithm.calculateSingleTruckArrangement(truck, remainingBoxes);
       
       if (testArrangement.arrangements.length > 0) {
+        const truckArea = truck.length * truck.width;
+        const usedArea = testArrangement.arrangements.reduce((sum, arr) => 
+          sum + (arr.width * arr.height), 0);
+        const wasteRatio = (truckArea - usedArea) / truckArea;
+        const boxFitRatio = testArrangement.arrangements.length / remainingBoxes.length;
+        
         let score = 0;
+        
+        // Prioritize trucks that fit more boxes with less waste
+        const baseScore = (boxFitRatio * 100) + (testArrangement.utilization);
+        const wasteDeduction = wasteRatio * 50; // Heavy penalty for waste
+        const sizeBonus = testArrangement.arrangements.length * 10; // Bonus for fitting more boxes
         
         switch (strategy.priority) {
           case 'truck_count':
-            // Prefer larger trucks that can fit more boxes
-            score = testArrangement.arrangements.length * 10 + testArrangement.utilization;
+            // Strongly prefer trucks that fit the most boxes with acceptable waste
+            score = baseScore + sizeBonus - wasteDeduction;
             break;
           case 'space_utilization':
-            // Prefer highest utilization
-            score = testArrangement.utilization;
+            // Prefer highest utilization with minimal waste
+            score = testArrangement.utilization - (wasteRatio * 30);
             break;
           case 'balanced':
-            // Balance between box count and utilization
-            score = (testArrangement.arrangements.length * 5) + (testArrangement.utilization * 0.5);
+            // Balance between box fit and waste minimization
+            score = baseScore + (sizeBonus * 0.5) - (wasteDeduction * 0.7);
             break;
         }
         
@@ -280,7 +310,9 @@ export const packingAlgorithm = {
           truck: truck,
           score: score,
           arrangements: testArrangement.arrangements.length,
-          utilization: testArrangement.utilization
+          utilization: testArrangement.utilization,
+          wasteRatio: wasteRatio,
+          boxFitRatio: boxFitRatio
         });
       }
     }
