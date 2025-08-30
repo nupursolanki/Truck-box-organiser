@@ -415,47 +415,68 @@ const TruckLoadingApp = () => {
                 <CardTitle className="flex items-center justify-between">
                   <span className="flex items-center gap-2">
                     <Truck className="h-5 w-5" />
-                    Loading Visualization
+                    {optimizationMode === 'single' ? 'Single Truck Loading' : 'Multi-Truck Optimization'}
                   </span>
-                  {selectedTruck && (
+                  {(selectedTruck || selectedSolution) && (
                     <Badge variant="outline">
-                      {selectedTruck.name}
+                      {optimizationMode === 'single' 
+                        ? selectedTruck?.name
+                        : `${selectedSolution?.strategy} (${selectedSolution?.totalTrucks} trucks)`
+                      }
                     </Badge>
                   )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {selectedTruck ? (
-                  <div className="space-y-4">
-                    <TruckCanvas 
-                      truck={selectedTruck}
-                      arrangement={arrangement}
-                    />
-                    
-                    {/* Box Legend */}
-                    {arrangement.length > 0 && (
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <h4 className="font-medium text-sm mb-3">Box Legend</h4>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
-                          {arrangement.map((box, index) => (
-                            <div key={box.instanceId} className="flex items-center gap-2">
-                              <div 
-                                className="w-3 h-3 rounded border"
-                                style={{ backgroundColor: box.color }}
-                              />
-                              <span>#{index + 1}: {box.name}</span>
-                            </div>
-                          ))}
+                {optimizationMode === 'single' ? (
+                  // Single Truck Mode
+                  selectedTruck ? (
+                    <div className="space-y-4">
+                      <TruckCanvas 
+                        truck={selectedTruck}
+                        arrangement={arrangement}
+                      />
+                      
+                      {/* Box Legend for Single Truck */}
+                      {arrangement.length > 0 && (
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          <h4 className="font-medium text-sm mb-3">Box Legend</h4>
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                            {arrangement.map((box, index) => (
+                              <div key={box.instanceId} className="flex items-center gap-2">
+                                <div 
+                                  className="w-3 h-3 rounded border"
+                                  style={{ backgroundColor: box.color }}
+                                />
+                                <span>#{index + 1}: {box.name}</span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12 text-gray-500">
+                      <Truck className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                      <h3 className="font-medium mb-2">No Truck Selected</h3>
+                      <p className="text-sm">Select a truck type to start planning your loading arrangement</p>
+                    </div>
+                  )
                 ) : (
-                  <div className="text-center py-12 text-gray-500">
-                    <Truck className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                    <h3 className="font-medium mb-2">No Truck Selected</h3>
-                    <p className="text-sm">Select a truck type to start planning your loading arrangement</p>
-                  </div>
+                  // Multi-Truck Mode
+                  boxes.length > 0 ? (
+                    <MultiTruckSolutionViewer
+                      solutions={multiTruckSolutions}
+                      onSolutionSelect={handleSolutionSelect}
+                      selectedSolution={selectedSolution}
+                    />
+                  ) : (
+                    <div className="text-center py-12 text-gray-500">
+                      <Award className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                      <h3 className="font-medium mb-2">Multi-Truck Optimization</h3>
+                      <p className="text-sm">Add boxes to see optimal truck combinations with minimal space wastage</p>
+                    </div>
+                  )
                 )}
               </CardContent>
             </Card>
