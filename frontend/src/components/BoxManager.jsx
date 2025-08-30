@@ -212,6 +212,16 @@ const BoxManager = ({ onBoxesChange, selectedTruckId, optimizationMode = 'single
           </CardContent>
         </Card>
       )}
+      
+      {(optimizationMode === 'multi') && (
+        <Card className="border-blue-200 bg-blue-50">
+          <CardContent className="pt-4">
+            <p className="text-sm text-blue-800">
+              Multi-truck optimization mode: Add boxes and the system will automatically find optimal truck combinations.
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Box List */}
       {boxes.length > 0 && (
