@@ -99,7 +99,7 @@ const TruckManager = ({ onTruckSelect, selectedTruckId }) => {
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>
-                {editingTruck ? 'Edit Truck Type' : 'Add New Truck Type'}
+                {editingTruck ? 'Edit Truck Size' : 'Add New Truck Size'}
               </DialogTitle>
             </DialogHeader>
             
