@@ -39,19 +39,23 @@ const TruckManager = ({ onTruckSelect, selectedTruckId }) => {
     
     const truckData = {
       id: editingTruck ? editingTruck.id : Date.now().toString(),
-      name: formData.name,
+      name: formData.name, // Preserve exact user-entered name
       length: parseInt(formData.length),
       width: parseInt(formData.width)
     };
 
+    let updatedTrucks;
     if (editingTruck) {
-      setTrucks(prev => prev.map(truck => 
+      updatedTrucks = trucks.map(truck => 
         truck.id === editingTruck.id ? truckData : truck
-      ));
+      );
     } else {
-      setTrucks(prev => [...prev, truckData]);
+      updatedTrucks = [...trucks, truckData];
     }
 
+    setTrucks(updatedTrucks);
+    // Save to localStorage to persist user changes
+    localStorage.setItem('userTrucks', JSON.stringify(updatedTrucks));
     resetForm();
   };
 
