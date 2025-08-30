@@ -145,25 +145,6 @@ const TruckManager = ({ onTruckSelect, selectedTruckId }) => {
                 </div>
               </div>
               
-              <div>
-                <Label htmlFor="type">Truck Type</Label>
-                <Select 
-                  value={formData.type} 
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, type: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {truckTypeOptions.map(option => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
               <div className="flex gap-2 pt-4">
                 <Button type="submit" className="flex-1">
                   {editingTruck ? 'Update Truck' : 'Add Truck'}
