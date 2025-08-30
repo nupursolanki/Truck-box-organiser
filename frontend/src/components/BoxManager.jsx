@@ -9,7 +9,11 @@ import { Trash2, Edit, Plus, Package, RotateCcw } from 'lucide-react';
 import { mockBoxes } from '../mockData';
 
 const BoxManager = ({ onBoxesChange, selectedTruckId, optimizationMode = 'single' }) => {
-  const [boxes, setBoxes] = useState(mockBoxes);
+  // Initialize with mock data only on first load, then preserve user changes
+  const [boxes, setBoxes] = useState(() => {
+    const savedBoxes = localStorage.getItem('userBoxes');
+    return savedBoxes ? JSON.parse(savedBoxes) : mockBoxes;
+  });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingBox, setEditingBox] = useState(null);
   const [formData, setFormData] = useState({
