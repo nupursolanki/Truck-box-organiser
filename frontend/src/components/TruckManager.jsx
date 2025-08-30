@@ -18,14 +18,17 @@ const TruckManager = ({ onTruckSelect, selectedTruckId }) => {
     width: ''
   });
 
-  const truckTypeOptions = [
-    { value: 'van', label: 'Delivery Van' },
-    { value: 'box_truck', label: 'Box Truck' },
-    { value: 'semi_trailer', label: 'Semi Trailer' },
-    { value: 'container', label: 'Container' },
-    { value: 'flatbed', label: 'Flatbed' },
-    { value: 'custom', label: 'Custom' }
+  const truckSizeCategories = [
+    { label: 'Small (up to 4m)', min: 0, max: 4000, color: 'text-green-600' },
+    { label: 'Medium (4-8m)', min: 4000, max: 8000, color: 'text-blue-600' },
+    { label: 'Large (8-12m)', min: 8000, max: 12000, color: 'text-orange-600' },
+    { label: 'Extra Large (12m+)', min: 12000, max: 20000, color: 'text-red-600' }
   ];
+
+  const getTruckCategory = (length) => {
+    return truckSizeCategories.find(cat => length >= cat.min && length < cat.max) || 
+           truckSizeCategories[truckSizeCategories.length - 1];
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
