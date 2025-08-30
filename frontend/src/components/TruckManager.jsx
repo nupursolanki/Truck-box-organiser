@@ -55,8 +55,7 @@ const TruckManager = ({ onTruckSelect, selectedTruckId }) => {
     setFormData({
       name: '',
       length: '',
-      width: '',
-      type: 'van'
+      width: ''
     });
     setEditingTruck(null);
     setIsDialogOpen(false);
