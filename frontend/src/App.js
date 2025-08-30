@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import TruckManager from "./components/TruckManager";
 import BoxManager from "./components/BoxManager";
 import TruckCanvas from "./components/TruckCanvas";
+import MultiTruckSolutionViewer from "./components/MultiTruckSolutionViewer";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
 import { Button } from "./components/ui/button";
 import { Badge } from "./components/ui/badge";
@@ -16,7 +17,9 @@ import {
   Download, 
   RefreshCw,
   AlertCircle,
-  CheckCircle
+  CheckCircle,
+  Zap,
+  Award
 } from "lucide-react";
 import { mockTruckTypes, packingAlgorithm } from "./mockData";
 
