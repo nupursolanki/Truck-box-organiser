@@ -107,6 +107,14 @@ const TruckLoadingApp = () => {
     }, 1200);
   };
 
+  // Sync available trucks when they're updated
+  const handleTrucksUpdate = () => {
+    const savedTrucks = localStorage.getItem('userTrucks');
+    if (savedTrucks) {
+      setAvailableTrucks(JSON.parse(savedTrucks));
+    }
+  };
+
   // Auto-calculate when mode, truck, or boxes change
   useEffect(() => {
     if (optimizationMode === 'single') {
@@ -114,7 +122,7 @@ const TruckLoadingApp = () => {
     } else {
       calculateMultiTruckOptimization();
     }
-  }, [selectedTruck, boxes, optimizationMode]);
+  }, [selectedTruck, boxes, optimizationMode, availableTrucks]);
 
   const handleOptimizationModeChange = (mode) => {
     setOptimizationMode(mode);
