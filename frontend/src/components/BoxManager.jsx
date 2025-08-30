@@ -84,6 +84,8 @@ const BoxManager = ({ onBoxesChange, selectedTruckId, optimizationMode = 'single
   const handleDelete = (boxId) => {
     const updatedBoxes = boxes.filter(box => box.id !== boxId);
     setBoxes(updatedBoxes);
+    // Save to localStorage to persist changes
+    localStorage.setItem('userBoxes', JSON.stringify(updatedBoxes));
     onBoxesChange(updatedBoxes);
   };
 
