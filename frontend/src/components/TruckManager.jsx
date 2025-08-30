@@ -80,7 +80,11 @@ const TruckManager = ({ onTruckSelect, selectedTruckId }) => {
   };
 
   const handleDelete = (truckId) => {
-    setTrucks(prev => prev.filter(truck => truck.id !== truckId));
+    const updatedTrucks = trucks.filter(truck => truck.id !== truckId);
+    setTrucks(updatedTrucks);
+    // Save to localStorage to persist changes
+    localStorage.setItem('userTrucks', JSON.stringify(updatedTrucks));
+    
     if (selectedTruckId === truckId) {
       onTruckSelect(null);
     }
