@@ -36,7 +36,7 @@ export const mockTruckTypes = [
 export const mockBoxes = [
   {
     id: '1',
-    name: 'Electronics Box A',
+    name: 'Electronics Box A',  // Preserved exactly as user entered
     length: 600,
     width: 400,
     quantity: 3,
@@ -44,7 +44,7 @@ export const mockBoxes = [
   },
   {
     id: '2', 
-    name: 'Furniture Package B',
+    name: 'Furniture Package B',  // Preserved exactly as user entered
     length: 1200,
     width: 800,
     quantity: 2,
@@ -52,7 +52,7 @@ export const mockBoxes = [
   },
   {
     id: '3',
-    name: 'Small Parts C',
+    name: 'Small Parts C',  // Preserved exactly as user entered
     length: 300,
     width: 200,
     quantity: 5,
@@ -60,7 +60,7 @@ export const mockBoxes = [
   },
   {
     id: '4',
-    name: 'Large Equipment D',
+    name: 'Large Equipment D',  // Preserved exactly as user entered
     length: 1500,
     width: 1000,
     quantity: 1,
