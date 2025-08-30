@@ -103,7 +103,7 @@ const BoxManager = ({ onBoxesChange, selectedTruckId, optimizationMode = 'single
           <DialogTrigger asChild>
             <Button 
               onClick={() => setEditingBox(null)}
-              disabled={!selectedTruckId}
+              disabled={!selectedTruckId && optimizationMode === 'single'}
             >
               <Plus className="h-4 w-4 mr-2" />
               Add Box
