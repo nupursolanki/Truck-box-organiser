@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Trash2, Edit, Plus, Truck } from 'lucide-react';
 import { mockTruckTypes } from '../mockData';
 
-const TruckManager = ({ onTruckSelect, selectedTruckId }) => {
+const TruckManager = ({ onTruckSelect, selectedTruckId, onTrucksUpdate }) => {
   // Initialize with mock data only on first load, then preserve user changes
   const [trucks, setTrucks] = useState(() => {
     const savedTrucks = localStorage.getItem('userTrucks');
