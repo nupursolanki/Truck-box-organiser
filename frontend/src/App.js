@@ -190,7 +190,7 @@ const TruckLoadingApp = () => {
 
           {/* Stats Overview */}
           {stats.totalBoxes > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
               <Card className="bg-white/80 backdrop-blur-sm">
                 <CardContent className="pt-4 pb-3">
                   <div className="flex items-center justify-between">
@@ -233,21 +233,74 @@ const TruckLoadingApp = () => {
                 </CardContent>
               </Card>
               
+              {optimizationMode === 'multi' && (
+                <Card className="bg-white/80 backdrop-blur-sm">
+                  <CardContent className="pt-4 pb-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-gray-600">Trucks Used</p>
+                        <p className="text-lg font-semibold text-orange-600">
+                          {stats.totalTrucks || 0}
+                        </p>
+                      </div>
+                      <Truck className="h-4 w-4 text-orange-500" />
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+              
               <Card className="bg-white/80 backdrop-blur-sm">
                 <CardContent className="pt-4 pb-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs text-gray-600">Area Used</p>
-                      <p className="text-lg font-semibold text-orange-600">
-                        {stats.usedArea?.toFixed(1)}m²
+                      <p className="text-xs text-gray-600">Mode</p>
+                      <p className="text-lg font-semibold text-indigo-600">
+                        {optimizationMode === 'single' ? 'Single' : 'Multi'}
                       </p>
                     </div>
-                    <Truck className="h-4 w-4 text-orange-500" />
+                    <Zap className="h-4 w-4 text-indigo-500" />
                   </div>
                 </CardContent>
               </Card>
             </div>
           )}
+
+          {/* Optimization Mode Selector */}
+          <Card className="bg-white/90 backdrop-blur-sm mb-6">
+            <CardContent className="pt-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold flex items-center gap-2">
+                  <Zap className="h-4 w-4" />
+                  Optimization Mode
+                </h3>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  variant={optimizationMode === 'single' ? 'default' : 'outline'}
+                  onClick={() => handleOptimizationModeChange('single')}
+                  className="justify-start"
+                >
+                  <Truck className="h-4 w-4 mr-2" />
+                  Single Truck
+                </Button>
+                <Button
+                  variant={optimizationMode === 'multi' ? 'default' : 'outline'}
+                  onClick={() => handleOptimizationModeChange('multi')}
+                  className="justify-start"
+                >
+                  <Award className="h-4 w-4 mr-2" />
+                  Auto-Optimize Multiple Trucks
+                </Button>
+              </div>
+              
+              <p className="text-xs text-gray-600 mt-2">
+                {optimizationMode === 'single' 
+                  ? 'Select a specific truck and arrange boxes manually' 
+                  : 'Automatically find optimal truck combinations with minimal waste'}
+              </p>
+            </CardContent>
+          </Card>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
