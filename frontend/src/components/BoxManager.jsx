@@ -8,7 +8,7 @@ import { Badge } from './ui/badge';
 import { Trash2, Edit, Plus, Package, RotateCcw } from 'lucide-react';
 import { mockBoxes } from '../mockData';
 
-const BoxManager = ({ onBoxesChange, selectedTruckId }) => {
+const BoxManager = ({ onBoxesChange, selectedTruckId, optimizationMode = 'single' }) => {
   const [boxes, setBoxes] = useState(mockBoxes);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingBox, setEditingBox] = useState(null);
