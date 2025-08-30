@@ -117,7 +117,7 @@ export const mockArrangements = [
   }
 ];
 
-// Box packing algorithm with constraints
+// Multi-truck packing algorithm with automatic truck selection
 export const packingAlgorithm = {
   // Minimum and maximum spacing between boxes
   MIN_SPACING: 50, // mm
@@ -126,42 +126,218 @@ export const packingAlgorithm = {
   // Maximum overhang allowed
   MAX_OVERHANG: 100, // mm
   
-  // Calculate optimal arrangement
-  calculateArrangement: (truck, boxes) => {
-    const arrangements = [];
-    let currentY = 0;
+  // Calculate optimal multi-truck arrangements (returns multiple solution options)
+  calculateOptimalArrangements: (availableTrucks, boxes) => {
+    const solutions = [];
     
-    // Sort boxes by area (largest first) for better space utilization
-    const sortedBoxes = [...boxes].sort((a, b) => 
-      (b.length * b.width * b.quantity) - (a.length * a.width * a.quantity)
-    );
+    // Generate 3 different optimization strategies
+    const strategies = [
+      { name: 'Minimize Trucks', priority: 'truck_count' },
+      { name: 'Maximize Efficiency', priority: 'space_utilization' },
+      { name: 'Balanced Solution', priority: 'balanced' }
+    ];
     
-    for (const box of sortedBoxes) {
-      for (let i = 0; i < box.quantity; i++) {
-        const placement = packingAlgorithm.findBestPosition(
-          truck, 
-          box, 
-          arrangements, 
-          `${box.name}-${i + 1}`
-        );
-        
-        if (placement) {
-          arrangements.push({
-            boxId: box.id,
-            instanceId: `${box.id}-${i + 1}`,
-            x: placement.x,
-            y: placement.y,
-            width: placement.width,
-            height: placement.height,
-            rotated: placement.rotated,
-            name: placement.name,
-            color: box.color
-          });
-        }
+    for (const strategy of strategies) {
+      const solution = packingAlgorithm.optimizeMultiTruck(availableTrucks, boxes, strategy);
+      if (solution.trucks.length > 0) {
+        solutions.push(solution);
       }
     }
     
-    return arrangements;
+    return solutions.sort((a, b) => b.overallScore - a.overallScore);
+  },
+  
+  // Multi-truck optimization algorithm
+  optimizeMultiTruck: (availableTrucks, boxes, strategy) => {
+    const solution = {
+      trucks: [],
+      strategy: strategy.name,
+      totalTrucks: 0,
+      totalBoxesPlaced: 0,
+      totalBoxes: boxes.reduce((sum, box) => sum + box.quantity, 0),
+      overallUtilization: 0,
+      overallScore: 0,
+      unplacedBoxes: [],
+      totalCost: 0
+    };
+    
+    // Create expanded box list with individual instances
+    let remainingBoxes = [];
+    boxes.forEach(box => {
+      for (let i = 0; i < box.quantity; i++) {
+        remainingBoxes.push({
+          ...box,
+          instanceId: `${box.id}-${i + 1}`,
+          instanceName: `${box.name}-${i + 1}`,
+          quantity: 1
+        });
+      }
+    });
+    
+    // Sort boxes by size (largest first for better packing)
+    remainingBoxes.sort((a, b) => (b.length * b.width) - (a.length * a.width));
+    
+    let truckCounter = 1;
+    
+    while (remainingBoxes.length > 0) {
+      const bestTruckChoice = packingAlgorithm.selectBestTruck(
+        availableTrucks, 
+        remainingBoxes, 
+        strategy
+      );
+      
+      if (!bestTruckChoice) break;
+      
+      const truckArrangement = packingAlgorithm.calculateSingleTruckArrangement(
+        bestTruckChoice.truck, 
+        remainingBoxes
+      );
+      
+      if (truckArrangement.arrangements.length === 0) break;
+      
+      // Add truck to solution
+      solution.trucks.push({
+        truckId: `${bestTruckChoice.truck.id}-${truckCounter}`,
+        truckType: bestTruckChoice.truck,
+        truckName: `${bestTruckChoice.truck.name} #${truckCounter}`,
+        arrangements: truckArrangement.arrangements,
+        utilization: truckArrangement.utilization,
+        boxCount: truckArrangement.arrangements.length,
+        efficiency: truckArrangement.efficiency
+      });
+      
+      // Remove placed boxes from remaining boxes
+      const placedInstanceIds = truckArrangement.arrangements.map(arr => arr.instanceId);
+      remainingBoxes = remainingBoxes.filter(box => !placedInstanceIds.includes(box.instanceId));
+      
+      solution.totalBoxesPlaced += truckArrangement.arrangements.length;
+      truckCounter++;
+      
+      // Prevent infinite loops
+      if (truckCounter > 20) break;
+    }
+    
+    solution.totalTrucks = solution.trucks.length;
+    solution.unplacedBoxes = remainingBoxes;
+    
+    // Calculate overall metrics
+    if (solution.trucks.length > 0) {
+      const totalTruckArea = solution.trucks.reduce((sum, truck) => 
+        sum + (truck.truckType.length * truck.truckType.width), 0);
+      const totalUsedArea = solution.trucks.reduce((sum, truck) => 
+        sum + truck.arrangements.reduce((areaSum, arr) => 
+          areaSum + (arr.width * arr.height), 0), 0);
+      
+      solution.overallUtilization = (totalUsedArea / totalTruckArea) * 100;
+      solution.totalCost = solution.trucks.length * 1000; // Base cost per truck
+      
+      // Calculate strategy-based score
+      switch (strategy.priority) {
+        case 'truck_count':
+          solution.overallScore = (solution.totalBoxesPlaced / solution.totalBoxes) * 100 - (solution.totalTrucks * 5);
+          break;
+        case 'space_utilization':
+          solution.overallScore = solution.overallUtilization;
+          break;
+        case 'balanced':
+          solution.overallScore = (solution.overallUtilization * 0.7) + 
+                                 ((solution.totalBoxesPlaced / solution.totalBoxes) * 0.3 * 100);
+          break;
+      }
+    }
+    
+    return solution;
+  },
+  
+  // Select best truck type for remaining boxes
+  selectBestTruck: (availableTrucks, remainingBoxes, strategy) => {
+    const truckScores = [];
+    
+    for (const truck of availableTrucks) {
+      const testArrangement = packingAlgorithm.calculateSingleTruckArrangement(truck, remainingBoxes);
+      
+      if (testArrangement.arrangements.length > 0) {
+        let score = 0;
+        
+        switch (strategy.priority) {
+          case 'truck_count':
+            // Prefer larger trucks that can fit more boxes
+            score = testArrangement.arrangements.length * 10 + testArrangement.utilization;
+            break;
+          case 'space_utilization':
+            // Prefer highest utilization
+            score = testArrangement.utilization;
+            break;
+          case 'balanced':
+            // Balance between box count and utilization
+            score = (testArrangement.arrangements.length * 5) + (testArrangement.utilization * 0.5);
+            break;
+        }
+        
+        truckScores.push({
+          truck: truck,
+          score: score,
+          arrangements: testArrangement.arrangements.length,
+          utilization: testArrangement.utilization
+        });
+      }
+    }
+    
+    return truckScores.sort((a, b) => b.score - a.score)[0];
+  },
+  
+  // Calculate arrangement for a single truck
+  calculateSingleTruckArrangement: (truck, boxes) => {
+    const arrangements = [];
+    const availableBoxes = [...boxes];
+    
+    // Sort boxes by area (largest first) for better space utilization
+    availableBoxes.sort((a, b) => (b.length * b.width) - (a.length * a.width));
+    
+    for (let i = 0; i < availableBoxes.length; i++) {
+      const box = availableBoxes[i];
+      const placement = packingAlgorithm.findBestPosition(
+        truck, 
+        box, 
+        arrangements, 
+        box.instanceName || `${box.name}-${i + 1}`
+      );
+      
+      if (placement) {
+        arrangements.push({
+          boxId: box.id,
+          instanceId: box.instanceId || `${box.id}-${i + 1}`,
+          x: placement.x,
+          y: placement.y,
+          width: placement.width,
+          height: placement.height,
+          rotated: placement.rotated,
+          name: placement.name,
+          color: box.color
+        });
+      }
+    }
+    
+    const truckArea = truck.length * truck.width;
+    const usedArea = arrangements.reduce((sum, arr) => sum + (arr.width * arr.height), 0);
+    const utilization = truckArea > 0 ? (usedArea / truckArea) * 100 : 0;
+    const efficiency = boxes.length > 0 ? (arrangements.length / boxes.length) * 100 : 0;
+    
+    return {
+      arrangements,
+      utilization: Math.min(utilization, 100),
+      efficiency,
+      usedArea: usedArea / 1000000, // Convert to m²
+      truckArea: truckArea / 1000000 // Convert to m²
+    };
+  },
+  
+  // Legacy single truck calculation (for backward compatibility)
+  calculateArrangement: (truck, boxes) => {
+    if (!truck || boxes.length === 0) return [];
+    
+    const result = packingAlgorithm.calculateSingleTruckArrangement(truck, boxes);
+    return result.arrangements;
   },
   
   // Find best position for a box
