@@ -27,12 +27,15 @@ const TruckLoadingApp = () => {
   const [selectedTruckId, setSelectedTruckId] = useState(null);
   const [boxes, setBoxes] = useState([]);
   const [arrangement, setArrangement] = useState([]);
+  const [multiTruckSolutions, setMultiTruckSolutions] = useState([]);
+  const [selectedSolution, setSelectedSolution] = useState(null);
+  const [optimizationMode, setOptimizationMode] = useState('single'); // 'single' or 'multi'
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState({});
 
   const selectedTruck = mockTruckTypes.find(t => t.id === selectedTruckId);
 
-  const calculateArrangement = () => {
+  const calculateSingleTruckArrangement = () => {
     if (!selectedTruck || boxes.length === 0) {
       setArrangement([]);
       setStats({});
@@ -41,12 +44,10 @@ const TruckLoadingApp = () => {
 
     setLoading(true);
     
-    // Simulate processing time for better UX
     setTimeout(() => {
       const result = packingAlgorithm.calculateArrangement(selectedTruck, boxes);
       setArrangement(result);
       
-      // Calculate statistics
       const totalBoxes = boxes.reduce((sum, box) => sum + box.quantity, 0);
       const placedBoxes = result.length;
       const truckArea = selectedTruck.length * selectedTruck.width;
@@ -58,7 +59,7 @@ const TruckLoadingApp = () => {
         placedBoxes,
         utilization: Math.min(utilization, 100),
         efficiency: (placedBoxes / totalBoxes) * 100,
-        truckArea: truckArea / 1000000, // Convert to m²
+        truckArea: truckArea / 1000000,
         usedArea: usedArea / 1000000,
         unplacedBoxes: totalBoxes - placedBoxes
       });
@@ -67,16 +68,82 @@ const TruckLoadingApp = () => {
     }, 800);
   };
 
-  // Auto-calculate when truck or boxes change
+  const calculateMultiTruckOptimization = () => {
+    if (boxes.length === 0) {
+      setMultiTruckSolutions([]);
+      setSelectedSolution(null);
+      return;
+    }
+
+    setLoading(true);
+    
+    setTimeout(() => {
+      const solutions = packingAlgorithm.calculateOptimalArrangements(mockTruckTypes, boxes);
+      setMultiTruckSolutions(solutions);
+      
+      // Auto-select the best solution (first one)
+      if (solutions.length > 0) {
+        setSelectedSolution(solutions[0]);
+        
+        // Calculate combined stats for the selected solution
+        const solution = solutions[0];
+        setStats({
+          totalBoxes: solution.totalBoxes,
+          placedBoxes: solution.totalBoxesPlaced,
+          utilization: solution.overallUtilization,
+          efficiency: (solution.totalBoxesPlaced / solution.totalBoxes) * 100,
+          unplacedBoxes: solution.unplacedBoxes.length,
+          totalTrucks: solution.totalTrucks
+        });
+      }
+      
+      setLoading(false);
+    }, 1200);
+  };
+
+  // Auto-calculate when mode, truck, or boxes change
   useEffect(() => {
-    calculateArrangement();
-  }, [selectedTruck, boxes]);
+    if (optimizationMode === 'single') {
+      calculateSingleTruckArrangement();
+    } else {
+      calculateMultiTruckOptimization();
+    }
+  }, [selectedTruck, boxes, optimizationMode]);
+
+  const handleOptimizationModeChange = (mode) => {
+    setOptimizationMode(mode);
+    if (mode === 'multi') {
+      setSelectedTruckId(null); // Clear single truck selection for multi-truck mode
+    }
+  };
+
+  const handleSolutionSelect = (solution) => {
+    setSelectedSolution(solution);
+    
+    // Update stats for selected solution
+    setStats({
+      totalBoxes: solution.totalBoxes,
+      placedBoxes: solution.totalBoxesPlaced,
+      utilization: solution.overallUtilization,
+      efficiency: (solution.totalBoxesPlaced / solution.totalBoxes) * 100,
+      unplacedBoxes: solution.unplacedBoxes.length,
+      totalTrucks: solution.totalTrucks
+    });
+  };
 
   const handleExportArrangement = () => {
-    const exportData = {
+    const exportData = optimizationMode === 'single' ? {
+      mode: 'single',
       truck: selectedTruck,
       boxes: boxes,
       arrangement: arrangement,
+      stats: stats,
+      exportDate: new Date().toISOString()
+    } : {
+      mode: 'multi',
+      solution: selectedSolution,
+      allSolutions: multiTruckSolutions,
+      boxes: boxes,
       stats: stats,
       exportDate: new Date().toISOString()
     };
@@ -88,7 +155,7 @@ const TruckLoadingApp = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `truck-loading-${selectedTruck?.name.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `truck-loading-${optimizationMode}-${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
