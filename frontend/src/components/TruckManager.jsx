@@ -37,8 +37,7 @@ const TruckManager = ({ onTruckSelect, selectedTruckId }) => {
       id: editingTruck ? editingTruck.id : Date.now().toString(),
       name: formData.name,
       length: parseInt(formData.length),
-      width: parseInt(formData.width),
-      type: formData.type
+      width: parseInt(formData.width)
     };
 
     if (editingTruck) {
