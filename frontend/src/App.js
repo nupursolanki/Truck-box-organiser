@@ -421,7 +421,7 @@ const TruckLoadingApp = () => {
                   {(selectedTruck || selectedSolution) && (
                     <Badge variant="outline">
                       {optimizationMode === 'single' 
-                        ? selectedTruck?.name
+                        ? selectedTruck?.name  // Show exact user-entered truck name
                         : `${selectedSolution?.strategy} (${selectedSolution?.totalTrucks} trucks)`
                       }
                     </Badge>
