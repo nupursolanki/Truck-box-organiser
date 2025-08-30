@@ -15,8 +15,7 @@ const TruckManager = ({ onTruckSelect, selectedTruckId }) => {
   const [formData, setFormData] = useState({
     name: '',
     length: '',
-    width: '',
-    type: 'van'
+    width: ''
   });
 
   const truckTypeOptions = [
