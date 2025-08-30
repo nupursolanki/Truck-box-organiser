@@ -336,7 +336,7 @@ const TruckLoadingApp = () => {
             </Tabs>
 
             {/* Loading Controls */}
-            {selectedTruck && boxes.length > 0 && (
+            {boxes.length > 0 && (
               <Card className="bg-white/90 backdrop-blur-sm">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm flex items-center gap-2">
@@ -346,19 +346,19 @@ const TruckLoadingApp = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <Button 
-                    onClick={calculateArrangement} 
+                    onClick={optimizationMode === 'single' ? calculateSingleTruckArrangement : calculateMultiTruckOptimization} 
                     className="w-full"
-                    disabled={loading}
+                    disabled={loading || (optimizationMode === 'single' && !selectedTruck)}
                   >
                     {loading ? (
                       <>
                         <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                        Calculating...
+                        {optimizationMode === 'single' ? 'Calculating...' : 'Optimizing...'}
                       </>
                     ) : (
                       <>
                         <Calculator className="h-4 w-4 mr-2" />
-                        Recalculate Layout
+                        {optimizationMode === 'single' ? 'Recalculate Layout' : 'Find Optimal Solutions'}
                       </>
                     )}
                   </Button>
@@ -367,7 +367,7 @@ const TruckLoadingApp = () => {
                     <div className="flex justify-between">
                       <span>Algorithm:</span>
                       <Badge variant="secondary" className="text-xs">
-                        Space Optimization
+                        {optimizationMode === 'single' ? 'Single Truck' : 'Multi-Truck Optimization'}
                       </Badge>
                     </div>
                     <div className="flex justify-between">
