@@ -84,7 +84,7 @@ const TruckLoadingApp = () => {
     setLoading(true);
     
     setTimeout(() => {
-      const solutions = packingAlgorithm.calculateOptimalArrangements(mockTruckTypes, boxes);
+      const solutions = packingAlgorithm.calculateOptimalArrangements(availableTrucks, boxes);
       setMultiTruckSolutions(solutions);
       
       // Auto-select the best solution (first one)
