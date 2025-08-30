@@ -34,7 +34,7 @@ const BoxManager = ({ onBoxesChange, selectedTruckId, optimizationMode = 'single
     
     const boxData = {
       id: editingBox ? editingBox.id : Date.now().toString(),
-      name: formData.name,
+      name: formData.name, // Preserve exact user-entered name
       length: parseInt(formData.length),
       width: parseInt(formData.width),
       quantity: parseInt(formData.quantity),
@@ -51,6 +51,8 @@ const BoxManager = ({ onBoxesChange, selectedTruckId, optimizationMode = 'single
     }
 
     setBoxes(updatedBoxes);
+    // Save to localStorage to persist user changes
+    localStorage.setItem('userBoxes', JSON.stringify(updatedBoxes));
     onBoxesChange(updatedBoxes);
     resetForm();
   };
