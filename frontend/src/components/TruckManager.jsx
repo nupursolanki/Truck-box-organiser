@@ -85,7 +85,7 @@ const TruckManager = ({ onTruckSelect, selectedTruckId }) => {
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold flex items-center gap-2">
           <Truck className="h-5 w-5" />
-          Truck Management
+          Available Truck Sizes
         </h2>
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
