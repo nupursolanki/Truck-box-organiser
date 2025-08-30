@@ -92,7 +92,7 @@ const TruckManager = ({ onTruckSelect, selectedTruckId }) => {
           <DialogTrigger asChild>
             <Button onClick={() => setEditingTruck(null)}>
               <Plus className="h-4 w-4 mr-2" />
-              Add Truck Type
+              Add Truck Size
             </Button>
           </DialogTrigger>
           
