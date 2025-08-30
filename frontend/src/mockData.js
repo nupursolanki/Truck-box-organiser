@@ -346,7 +346,7 @@ export const packingAlgorithm = {
           width: placement.width,
           height: placement.height,
           rotated: placement.rotated,
-          name: placement.name,
+          name: box.name, // Use exact user-entered box name
           color: box.color
         });
       }
