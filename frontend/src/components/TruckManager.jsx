@@ -9,7 +9,11 @@ import { Trash2, Edit, Plus, Truck } from 'lucide-react';
 import { mockTruckTypes } from '../mockData';
 
 const TruckManager = ({ onTruckSelect, selectedTruckId }) => {
-  const [trucks, setTrucks] = useState(mockTruckTypes);
+  // Initialize with mock data only on first load, then preserve user changes
+  const [trucks, setTrucks] = useState(() => {
+    const savedTrucks = localStorage.getItem('userTrucks');
+    return savedTrucks ? JSON.parse(savedTrucks) : mockTruckTypes;
+  });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTruck, setEditingTruck] = useState(null);
   const [formData, setFormData] = useState({
