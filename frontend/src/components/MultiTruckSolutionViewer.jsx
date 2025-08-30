@@ -32,18 +32,18 @@ const MultiTruckSolutionViewer = ({ solutions, onSolutionSelect, selectedSolutio
 
   const getStrategyIcon = (strategyName) => {
     switch (strategyName) {
-      case 'Minimize Trucks': return <Truck className="h-4 w-4" />;
-      case 'Maximize Efficiency': return <TrendingUp className="h-4 w-4" />;
-      case 'Balanced Solution': return <Award className="h-4 w-4" />;
+      case 'Minimum Trucks': return <Truck className="h-4 w-4" />;
+      case 'Space Efficient': return <TrendingUp className="h-4 w-4" />;
+      case 'Optimal Balance': return <Award className="h-4 w-4" />;
       default: return <Package className="h-4 w-4" />;
     }
   };
 
   const getStrategyColor = (strategyName) => {
     switch (strategyName) {
-      case 'Minimize Trucks': return 'bg-blue-100 text-blue-800';
-      case 'Maximize Efficiency': return 'bg-green-100 text-green-800';
-      case 'Balanced Solution': return 'bg-purple-100 text-purple-800';
+      case 'Minimum Trucks': return 'bg-blue-100 text-blue-800';
+      case 'Space Efficient': return 'bg-green-100 text-green-800';
+      case 'Optimal Balance': return 'bg-purple-100 text-purple-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
