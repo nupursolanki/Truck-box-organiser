@@ -132,11 +132,11 @@ export const packingAlgorithm = {
   calculateOptimalArrangements: (availableTrucks, boxes) => {
     const solutions = [];
     
-    // Generate 3 different optimization strategies
+    // Generate 3 different optimization strategies focused on minimal trucks and space efficiency
     const strategies = [
-      { name: 'Minimize Trucks', priority: 'truck_count' },
-      { name: 'Maximize Efficiency', priority: 'space_utilization' },
-      { name: 'Balanced Solution', priority: 'balanced' }
+      { name: 'Minimum Trucks', priority: 'truck_count' },
+      { name: 'Space Efficient', priority: 'space_utilization' },
+      { name: 'Optimal Balance', priority: 'balanced' }
     ];
     
     for (const strategy of strategies) {
