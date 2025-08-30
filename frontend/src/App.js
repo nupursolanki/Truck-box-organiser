@@ -32,8 +32,14 @@ const TruckLoadingApp = () => {
   const [optimizationMode, setOptimizationMode] = useState('single'); // 'single' or 'multi'
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState({});
+  
+  // Get current trucks from localStorage to use actual user data
+  const [availableTrucks, setAvailableTrucks] = useState(() => {
+    const savedTrucks = localStorage.getItem('userTrucks');
+    return savedTrucks ? JSON.parse(savedTrucks) : mockTruckTypes;
+  });
 
-  const selectedTruck = mockTruckTypes.find(t => t.id === selectedTruckId);
+  const selectedTruck = availableTrucks.find(t => t.id === selectedTruckId);
 
   const calculateSingleTruckArrangement = () => {
     if (!selectedTruck || boxes.length === 0) {
